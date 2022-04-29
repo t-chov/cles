@@ -71,7 +71,7 @@ var commands = []*cli.Command{
 			},
 			{
 				Name:      "delete",
-				Aliases:   []string{"d", "rm"},
+				Aliases:   []string{"rm"},
 				Usage:     "delete index",
 				Action:    cmdDeleteIndex,
 				ArgsUsage: "<INDEX_NAME>...",

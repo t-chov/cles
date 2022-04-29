@@ -32,7 +32,30 @@ func prettyCatAliases(client *elastic.Client) (*string, error) {
 	}
 	output := buf.String()
 	return &output, nil
+}
 
+func prettyCatIndices(client *elastic.Client) (*string, error) {
+	res, err := client.CatIndices().Human(true).Do(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	var buf strings.Builder
+	headers := []string{
+		"health", "status", "index", "uuid", "pri", "rep", "docs.count",
+		"docs.deleted", "store.size", "pri.store.size",
+	}
+	buf.WriteString(strings.Join(headers, "\t") + "\n")
+	for _, v := range res {
+		row := fmt.Sprintf(
+			"%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			v.Health, v.Status, v.Index, v.UUID, v.Pri, v.Rep, v.DocsCount,
+			v.DocsDeleted, v.StoreSize, v.PriStoreSize,
+		)
+		buf.WriteString(row)
+	}
+	output := buf.String()
+	return &output, nil
 }
 
 func cmdCatAliases(c *cli.Context) error {
@@ -43,6 +66,21 @@ func cmdCatAliases(c *cli.Context) error {
 	}
 
 	res, err := prettyCatAliases(client)
+	if err != nil {
+		return err
+	}
+	fmt.Print(*res)
+	return nil
+}
+
+func cmdCatIndices(c *cli.Context) error {
+	client, err := initClient(c.String("profile"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "initClient failure")
+		return err
+	}
+
+	res, err := prettyCatIndices(client)
 	if err != nil {
 		return err
 	}

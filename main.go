@@ -57,6 +57,19 @@ var commands = []*cli.Command{
 					},
 				},
 			},
+			{
+				Name:    "indices",
+				Aliases: []string{"i"},
+				Usage:   "cat indices",
+				Action:  cmdCatIndices,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+				},
+			},
 		},
 	},
 }

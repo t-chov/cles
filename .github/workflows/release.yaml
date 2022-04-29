@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
@@ -32,10 +32,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
   docker:
-    name: Release
+    name: Push docker image
     runs-on: ubuntu-latest
     steps:
       # https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Log in to Docker hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:

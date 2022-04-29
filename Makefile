@@ -21,7 +21,7 @@ cross: $(GOBIN)/goxz
 	goxz -n $(BIN) -pv=v$(VERSION) -build-ldflags=$(BUILD_LDFLAGS) .
 
 $(GOBIN)/goxz:
-	cd && go install github.com/Songmu/goxz/cmd/goxz
+	cd && go install github.com/Songmu/goxz/cmd/goxz@latest
 
 .PHONY: test
 test: build
@@ -51,4 +51,4 @@ upload: $(GOBIN)/ghr
 	ghr "v$(VERSION)" goxz
 
 $(GOBIN)/ghr:
-	cd && go install github.com/tcnksm/ghr
+	cd && go install github.com/tcnksm/ghr@latest

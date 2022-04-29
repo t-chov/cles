@@ -24,7 +24,26 @@ var commands = []*cli.Command{
 				Aliases:   []string{"a"},
 				Usage:     "manage alias",
 				Action:    cmdAliasIndex,
-				ArgsUsage: "<INDEC_NAME> <ALIAS_NAMES>...",
+				ArgsUsage: "<INDEX_NAME> <ALIAS_NAME>",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "rm",
+						Usage: "remove alias",
+					},
+				},
+			},
+		},
+	},
+	{
+		Name:    "cat",
+		Aliases: []string{"c"},
+		Usage:   "exec cat API",
+		Subcommands: []*cli.Command{
+			{
+				Name:    "aliases",
+				Aliases: []string{"a"},
+				Usage:   "cat aliases",
+				Action:  cmdCatAliases,
 			},
 		},
 	},

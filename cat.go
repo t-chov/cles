@@ -36,12 +36,9 @@ func prettyCatAliases(client *elastic.Client) (*string, error) {
 }
 
 func cmdCatAliases(c *cli.Context) error {
-	client, err := elastic.NewClient(
-		elastic.SetURL("http://127.0.0.1:9200"),
-		elastic.SetSniff(false),
-	)
+	client, err := initClient(c.String("profile"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "client failure")
+		fmt.Fprintf(os.Stderr, "initClient failure")
 		return err
 	}
 

@@ -16,12 +16,9 @@ func cmdAliasIndex(c *cli.Context) error {
 	indexName := c.Args().Get(0)
 	aliasName := c.Args().Get(1)
 
-	client, err := elastic.NewClient(
-		elastic.SetURL("http://127.0.0.1:9200"),
-		elastic.SetSniff(false),
-	)
+	client, err := initClient(c.String("profile"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "client failure")
+		fmt.Fprintf(os.Stderr, "initClient failure")
 		return err
 	}
 

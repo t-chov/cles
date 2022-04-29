@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	name     = "cles"
+	appName  = "cles"
 	version  = "0.0.1"
 	revision = "HEAD"
 )
@@ -26,6 +26,11 @@ var commands = []*cli.Command{
 				Action:    cmdAliasIndex,
 				ArgsUsage: "<INDEX_NAME> <ALIAS_NAME>",
 				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
 					&cli.BoolFlag{
 						Name:  "rm",
 						Usage: "remove alias",
@@ -44,6 +49,13 @@ var commands = []*cli.Command{
 				Aliases: []string{"a"},
 				Usage:   "cat aliases",
 				Action:  cmdCatAliases,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+				},
 			},
 		},
 	},
@@ -67,7 +79,7 @@ func appRun(c *cli.Context) error {
 
 func run() int {
 	app := cli.NewApp()
-	app.Name = name
+	app.Name = appName
 	app.Usage = "Command line client for Elasticsearch"
 	app.Version = version
 	app.Commands = commands

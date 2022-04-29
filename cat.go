@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/olivere/elastic/v7"
@@ -59,11 +58,7 @@ func prettyCatIndices(client *elastic.Client) (*string, error) {
 }
 
 func cmdCatAliases(c *cli.Context) error {
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	res, err := prettyCatAliases(client)
 	if err != nil {
@@ -74,11 +69,7 @@ func cmdCatAliases(c *cli.Context) error {
 }
 
 func cmdCatIndices(c *cli.Context) error {
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	res, err := prettyCatIndices(client)
 	if err != nil {

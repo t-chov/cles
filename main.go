@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -109,34 +110,35 @@ var commands = []*cli.Command{
 		Name:    "cat",
 		Aliases: []string{"c"},
 		Usage:   "exec cat API",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "profile",
+				Aliases:     []string{"p"},
+				Usage:       "set profile name",
+				DefaultText: "default",
+			},
+		},
+		Before: func(c *cli.Context) error {
+			client, err := initClient(c.String("profile"))
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "initClient failure")
+				return err
+			}
+			c.Context = context.WithValue(c.Context, "client", client)
+			return nil
+		},
 		Subcommands: []*cli.Command{
 			{
 				Name:    "aliases",
 				Aliases: []string{"a"},
 				Usage:   "cat aliases",
 				Action:  cmdCatAliases,
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
-				},
 			},
 			{
 				Name:    "indices",
 				Aliases: []string{"i"},
 				Usage:   "cat indices",
 				Action:  cmdCatIndices,
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
-				},
 			},
 		},
 	},

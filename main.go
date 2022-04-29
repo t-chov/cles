@@ -28,12 +28,29 @@ var commands = []*cli.Command{
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "profile",
+						Aliases:     []string{"p"},
 						Usage:       "set profile name",
 						DefaultText: "default",
 					},
 					&cli.BoolFlag{
-						Name:  "rm",
-						Usage: "remove alias",
+						Name:    "delete",
+						Aliases: []string{"rm", "d"},
+						Usage:   "delete alias",
+					},
+				},
+			},
+			{
+				Name:      "delete",
+				Aliases:   []string{"d", "rm"},
+				Usage:     "delete index",
+				Action:    cmdDeleteIndex,
+				ArgsUsage: "<INDEX_NAME>...",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
 					},
 				},
 			},
@@ -52,6 +69,7 @@ var commands = []*cli.Command{
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "profile",
+						Aliases:     []string{"p"},
 						Usage:       "set profile name",
 						DefaultText: "default",
 					},
@@ -65,6 +83,7 @@ var commands = []*cli.Command{
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "profile",
+						Aliases:     []string{"p"},
 						Usage:       "set profile name",
 						DefaultText: "default",
 					},

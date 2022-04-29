@@ -124,6 +124,7 @@ var commands = []*cli.Command{
 				fmt.Fprintf(os.Stderr, "initClient failure")
 				return err
 			}
+			//lint:ignore SA1029 initClient before subcommand
 			c.Context = context.WithValue(c.Context, "client", client)
 			return nil
 		},

@@ -1,6 +1,6 @@
 # cles: CLI client for Elasticsearch
 
-## What are cles?
+## What is cles?
 
 **cles** is a tool to manage [Elasticsearch](https://www.elastic.co/elasticsearch/) easily.
 

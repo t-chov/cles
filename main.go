@@ -18,6 +18,15 @@ var commands = []*cli.Command{
 		Name:    "indices",
 		Aliases: []string{"i", "index"},
 		Usage:   "operate indices",
+		Action:  cmdCatIndices,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "profile",
+				Aliases:     []string{"p"},
+				Usage:       "set profile name",
+				DefaultText: "default",
+			},
+		},
 		Subcommands: []*cli.Command{
 			{
 				Name:      "alias",
@@ -126,6 +135,62 @@ var commands = []*cli.Command{
 						Aliases:     []string{"p"},
 						Usage:       "set profile name",
 						DefaultText: "default",
+					},
+				},
+			},
+		},
+	},
+	{
+		Name:    "search-template",
+		Aliases: []string{"st"},
+		Usage:   "operate search templates",
+		Action:  cmdListSearchTemplates,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "profile",
+				Aliases:     []string{"p"},
+				Usage:       "set profile name",
+				DefaultText: "default",
+			},
+		},
+		Subcommands: []*cli.Command{
+			{
+				Name:    "list",
+				Aliases: []string{"ls"},
+				Usage:   "list search template",
+				Action:  cmdListSearchTemplates,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+					&cli.BoolFlag{
+						Name:    "verbose",
+						Aliases: []string{"v"},
+						Usage:   "show detail",
+					},
+				},
+			},
+			{
+				Name:      "create",
+				Aliases:   []string{"c", "new"},
+				Usage:     "create search template",
+				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
+				Action:    cmdCreateSearchTemplate,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+					&cli.PathFlag{
+						Name:     "body",
+						Aliases:  []string{"b"},
+						Usage:    "path to request body",
+						Required: true,
 					},
 				},
 			},

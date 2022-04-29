@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"strings"
 
@@ -109,5 +110,43 @@ func cmdDeleteSearchTemplate(c *cli.Context) error {
 	}
 
 	fmt.Print(*output)
+	return nil
+}
+
+func cmdRenderSearchTemplate(c *cli.Context) error {
+	if c.Args().Len() < 1 {
+		return fmt.Errorf("must set search template name to create")
+	}
+	templateName := c.Args().Get(0)
+
+	client, err := initClient(c.String("profile"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "initClient failure")
+		return err
+	}
+
+	var params interface{}
+	paramsRaw := c.String("params")
+	err = json.Unmarshal([]byte(paramsRaw), &params)
+	if err != nil {
+		return err
+	}
+	renderbody := make(map[string]interface{})
+	renderbody["id"] = templateName
+	renderbody["params"] = params
+
+	var urlValues url.Values
+	res, err := client.PerformRequest(context.Background(), elastic.PerformRequestOptions{
+		Method:      "POST",
+		Path:        "/_render/template",
+		Params:      urlValues,
+		Body:        renderbody,
+		ContentType: "application/json",
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s\n", res.Body)
 	return nil
 }

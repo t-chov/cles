@@ -209,6 +209,25 @@ var commands = []*cli.Command{
 					},
 				},
 			},
+			{
+				Name:      "render",
+				Usage:     "render search template",
+				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
+				Action:    cmdRenderSearchTemplate,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+					&cli.StringFlag{
+						Name:        "params",
+						Usage:       "set params",
+						DefaultText: "{}",
+					},
+				},
+			},
 		},
 	},
 }

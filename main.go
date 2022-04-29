@@ -194,6 +194,21 @@ var commands = []*cli.Command{
 					},
 				},
 			},
+			{
+				Name:      "delete",
+				Aliases:   []string{"rm"},
+				Usage:     "delete search template",
+				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
+				Action:    cmdDeleteSearchTemplate,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+				},
+			},
 		},
 	},
 }

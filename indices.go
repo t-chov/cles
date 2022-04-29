@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/olivere/elastic/v7"
@@ -41,6 +42,38 @@ func cmdAliasIndex(c *cli.Context) error {
 		return err
 	}
 
+	fmt.Print(*res)
+	return nil
+}
+
+func cmdCreateIndex(c *cli.Context) error {
+	if c.Args().Len() < 1 {
+		return fmt.Errorf("must set index name to create")
+	}
+	indexName := c.Args().Get(0)
+
+	client, err := initClient(c.String("profile"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "initClient failure")
+		return err
+	}
+
+	body := c.Path("body")
+	bytes, err := ioutil.ReadFile(body)
+	if err != nil {
+		return err
+	}
+
+	service := client.CreateIndex(indexName)
+	_, err = service.Body(string(bytes)).Do(context.Background())
+	if err != nil {
+		return err
+	}
+
+	res, err := prettyCatIndices(client)
+	if err != nil {
+		return err
+	}
 	fmt.Print(*res)
 	return nil
 }

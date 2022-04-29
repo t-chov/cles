@@ -40,6 +40,27 @@ var commands = []*cli.Command{
 				},
 			},
 			{
+				Name:      "create",
+				Aliases:   []string{"c", "new"},
+				Usage:     "create index",
+				Action:    cmdCreateIndex,
+				ArgsUsage: "<INDEX_NAME>",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+					&cli.PathFlag{
+						Name:     "body",
+						Aliases:  []string{"b"},
+						Usage:    "path to request body",
+						Required: true,
+					},
+				},
+			},
+			{
 				Name:      "delete",
 				Aliases:   []string{"d", "rm"},
 				Usage:     "delete index",

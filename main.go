@@ -75,6 +75,25 @@ var commands = []*cli.Command{
 					},
 				},
 			},
+			{
+				Name:      "mapping",
+				Aliases:   []string{"m"},
+				Usage:     "get mapping",
+				Action:    cmdGetMapping,
+				ArgsUsage: "<INDEX_NAME>...",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "profile",
+						Aliases:     []string{"p"},
+						Usage:       "set profile name",
+						DefaultText: "default",
+					},
+					&cli.BoolFlag{
+						Name:  "all",
+						Usage: "show all mappings",
+					},
+				},
+			},
 		},
 	},
 	{

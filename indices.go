@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -101,5 +102,31 @@ func cmdDeleteIndex(c *cli.Context) error {
 	}
 
 	fmt.Print(*res)
+	return nil
+}
+
+func cmdGetMapping(c *cli.Context) error {
+	index := c.Args().Slice()
+	if c.Bool("all") {
+		index = []string{"_all"}
+	}
+
+	client, err := initClient(c.String("profile"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "initClient failure")
+		return err
+	}
+
+	service := client.GetMapping()
+	res, err := service.Index(index...).Do(context.Background())
+	if err != nil {
+		return err
+	}
+	bytes, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(bytes))
+
 	return nil
 }

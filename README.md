@@ -14,7 +14,7 @@ You can access Elasticsearch without complicated curl options.
 An example project is available in the [`example directory`](./example/)
 
 ```sh
-# The setting file is available.
+# A setting file is available.
 # windows  : $APPDATA\cles\config.toml
 # unix-like: $HOME/.config/cles/config.toml
 $ cat ${HOME}/.config/cles/config.toml

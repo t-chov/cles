@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/olivere/elastic/v7"
 	"github.com/urfave/cli/v2"
@@ -51,7 +52,13 @@ func cmdCreateIndex(c *cli.Context) error {
 	client := c.Context.Value("client").(*elastic.Client)
 
 	body := c.Path("body")
-	bytes, err := ioutil.ReadFile(body)
+	var bytes []byte
+	var err error
+	if len(body) > 0 {
+		bytes, err = ioutil.ReadFile(body)
+	} else {
+		bytes, err = ioutil.ReadAll(os.Stdin)
+	}
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,68 @@
+{
+    "settings": {
+        "number_of_shards": "1",
+        "number_of_replicas": "0"
+    },
+    "mappings": {
+        "properties": {
+            "collision_id": {
+                "type": "integer"
+            },
+            "crashed_at": {
+                "type": "date"
+            },
+            "borough": {
+                "type": "text"
+            },
+            "zipcode": {
+                "type": "keyword"
+            },
+            "location": {
+                "type": "geo_point"
+            },
+            "on_street_name": {
+                "type": "text"
+            },
+            "off_street_name": {
+                "type": "text"
+            },
+            "cross_street_name": {
+                "type": "text"
+            },
+            "persons_injured": {
+                "type": "integer"
+            },
+            "persons_killed": {
+                "type": "integer"
+            },
+            "pedestrians_injured": {
+                "type": "integer"
+            },
+            "pedestrians_killed": {
+                "type": "integer"
+            },
+            "cyclist_injured": {
+                "type": "integer"
+            },
+            "cyclist_killed": {
+                "type": "integer"
+            },
+            "motarist_injured": {
+                "type": "integer"
+            },
+            "motarist_killed": {
+                "type": "integer"
+            },
+            "contributing_factors": {
+                "properties": {
+                    "vehicle_type": {
+                        "type": "text"
+                    },
+                    "factor": {
+                        "type": "text"
+                    }
+                }
+            }
+        }
+    }
+}

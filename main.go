@@ -43,10 +43,10 @@ var commands = []*cli.Command{
 				ArgsUsage: "<INDEX_NAME>",
 				Flags: []cli.Flag{
 					&cli.PathFlag{
-						Name:     "body",
-						Aliases:  []string{"b"},
-						Usage:    "path to request body",
-						Required: true,
+						Name:        "body",
+						Aliases:     []string{"b"},
+						Usage:       "path to request body",
+						DefaultText: "stdin",
 					},
 				},
 			},
@@ -161,10 +161,9 @@ var commands = []*cli.Command{
 				Action:    cmdBulkIndex,
 				Flags: []cli.Flag{
 					&cli.PathFlag{
-						Name:     "source",
-						Aliases:  []string{"s", "src"},
-						Usage:    "source file path(ndjson)",
-						Required: true,
+						Name:    "source",
+						Aliases: []string{"s", "src"},
+						Usage:   "source file path(ndjson) if empty, read stdin",
 					},
 					&cli.StringFlag{
 						Name:    "id-column",

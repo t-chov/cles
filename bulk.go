@@ -69,12 +69,20 @@ func cmdBulkIndex(c *cli.Context) error {
 	}
 
 	// load source file
-	f, err := os.Open(c.Path("source"))
-	if err != nil {
-		return err
+	var f *os.File
+	var bar *pb.ProgressBar
+	if len(c.Path("source")) > 0 {
+		var err error
+		f, err = os.Open(c.Path("source"))
+		if err != nil {
+			return err
+		}
+		bar = pb.StartNew(calcNumOfLines(f))
+	} else {
+		f = os.Stdin
+		bar = pb.StartNew(-1)
 	}
 	defer f.Close()
-	bar := pb.StartNew(calcNumOfLines(f))
 
 	bulkRequest := client.Bulk().Index(indexName)
 	// TODO make buffer size configurable. implement parse logic
@@ -112,7 +120,7 @@ func cmdBulkIndex(c *cli.Context) error {
 		currentBufferSize += eachReqSize
 		bulkRequest.Add(eachRequet)
 	}
-	_, err = bulkRequest.Do(context.Background())
+	_, err := bulkRequest.Do(context.Background())
 	if err != nil {
 		return err
 	}

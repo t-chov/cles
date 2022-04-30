@@ -5,14 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 
+	"github.com/cheggaaa/pb/v3"
 	"github.com/olivere/elastic/v7"
 	"github.com/urfave/cli/v2"
 )
 
-func id2str(rawId interface{}) (string, error) {
+func idToStr(rawId interface{}) (string, error) {
 	switch val := rawId.(type) {
 	case int:
 		return strconv.Itoa(val), nil
@@ -20,6 +22,40 @@ func id2str(rawId interface{}) (string, error) {
 		return val, nil
 	default:
 		return "", fmt.Errorf("cannot convert id: %v", rawId)
+	}
+}
+
+func calcNumOfLines(f *os.File) int {
+	sc := bufio.NewScanner(f)
+	num := 0
+	for sc.Scan() {
+		num++
+	}
+	f.Seek(0, io.SeekStart)
+	return num
+}
+
+func rowToDoc(rawRow []byte) (map[string]interface{}, error) {
+	var rowInterface interface{}
+	err := json.Unmarshal(rawRow, &rowInterface)
+	if err != nil {
+		return nil, err
+	}
+	return rowInterface.(map[string]interface{}), nil
+}
+
+func getId(doc map[string]interface{}, idColumn string) (*string, error) {
+	if len(idColumn) == 0 {
+		return nil, nil
+	}
+	if rawId, ok := doc[idColumn]; ok {
+		id, err := idToStr(rawId)
+		if err != nil {
+			return nil, err
+		}
+		return &id, nil
+	} else {
+		return nil, fmt.Errorf("no id column `%s` in %v", idColumn, doc)
 	}
 }
 
@@ -32,49 +68,55 @@ func cmdBulkIndex(c *cli.Context) error {
 		return fmt.Errorf("need argument: name of index")
 	}
 
+	// load source file
 	f, err := os.Open(c.Path("source"))
 	if err != nil {
 		return err
 	}
 	defer f.Close()
+	bar := pb.StartNew(calcNumOfLines(f))
 
-	idColumn := c.String("id-column")
 	bulkRequest := client.Bulk().Index(indexName)
 	// TODO make buffer size configurable. implement parse logic
 	// default: 10MB
 	bufferSize := 10 * 1024 * 1024
 
-	var rowInterface interface{}
 	currentBufferSize := 0
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		err := json.Unmarshal(scanner.Bytes(), &rowInterface)
+		bar.Increment()
+		doc, err := rowToDoc(scanner.Bytes())
 		if err != nil {
 			return err
 		}
 
-		row := rowInterface.(map[string]interface{})
-		if rawId, ok := row[idColumn]; ok {
-			id, err := id2str(rawId)
+		id, err := getId(doc, c.String("id-column"))
+		if err != nil {
+			return err
+		}
+
+		eachRequet := elastic.NewBulkIndexRequest().Index(indexName).Doc(doc)
+		if id != nil {
+			eachRequet = eachRequet.Id(*id)
+		}
+
+		eachReqSize := len(eachRequet.String())
+		estimatedBufferSize := currentBufferSize + eachReqSize
+		if estimatedBufferSize > bufferSize {
+			_, err := bulkRequest.Do(context.Background())
 			if err != nil {
 				return err
 			}
-			request := elastic.NewBulkIndexRequest().Index(indexName).Id(id).Doc(row)
-			estimatedBufferSize := currentBufferSize + len(request.String())
-			if estimatedBufferSize > bufferSize {
-				bulkRequest.Do(context.Background())
-				os.Exit(0)
-			} else {
-				currentBufferSize = estimatedBufferSize
-				bulkRequest.Add(request)
-			}
-		} else if len(idColumn) > 0 {
-			return fmt.Errorf("no id column `%s` in %v", idColumn, row)
+			currentBufferSize = 0
 		}
+		currentBufferSize += eachReqSize
+		bulkRequest.Add(eachRequet)
 	}
-	bulkRequest.Do(context.Background())
-
-	fmt.Printf("%v\n", client)
+	_, err = bulkRequest.Do(context.Background())
+	if err != nil {
+		return err
+	}
+	bar.Finish()
 
 	return nil
 }

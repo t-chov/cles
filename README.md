@@ -184,9 +184,9 @@ If you set this value, the client will use [sniffing](https://www.elastic.co/jp/
 
 ## FAQ
 
-### I have no active conneciton.
+### I have no active conneciton with single-node mode.
 
-If you have this error message, you have to set `ES_SNIFF` to false.
+If you have this error message with single-node mode, you have to set `ES_SNIFF` to false.
 
 ```
 initClient failure! cles: no active connection found: no Elasticsearch node available

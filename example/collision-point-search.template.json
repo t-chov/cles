@@ -1,0 +1,36 @@
+{
+    "script": {
+        "lang": "mustache",
+        "source": {
+            "query": {
+                "bool": {
+                    "must": {
+                        "match_all": {}
+                    },
+                    "filter": {
+                        "geo_distance": {
+                            "distance": "{{distance}}",
+                            "location": {
+                                "lat": "{{latitude}}",
+                                "lon": "{{longitude}}"
+                            }
+                        }
+                    }
+                }
+            },
+            "sort": [
+                {
+                    "_geo_distance": {
+                        "location": {
+                            "lat": "{{latitude}}",
+                            "lon": "{{longitude}}"
+                        },
+                        "order": "asc",
+                        "unit": "m",
+                        "mode": "min"
+                    }
+                }
+            ]
+        }
+    }
+}

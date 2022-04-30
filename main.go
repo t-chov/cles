@@ -118,10 +118,10 @@ var commands = []*cli.Command{
 				Action:    cmdCreateSearchTemplate,
 				Flags: []cli.Flag{
 					&cli.PathFlag{
-						Name:     "body",
-						Aliases:  []string{"b"},
-						Usage:    "path to request body",
-						Required: true,
+						Name:        "body",
+						Aliases:     []string{"b"},
+						Usage:       "path to request body",
+						DefaultText: "stdin",
 					},
 				},
 			},
@@ -134,15 +134,34 @@ var commands = []*cli.Command{
 			},
 			{
 				Name:      "render",
+				Aliases:   []string{"r"},
 				Usage:     "render search template",
 				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
 				Action:    cmdRenderSearchTemplate,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "params",
-						Value:       "{}",
-						Usage:       "set params",
-						DefaultText: "{}",
+						Usage:       "set search params",
+						DefaultText: "stdin",
+					},
+				},
+			},
+			{
+				Name:      "search",
+				Aliases:   []string{"s"},
+				Usage:     "search with template",
+				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
+				Action:    cmdSearchWithTemplate,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "params",
+						Usage:       "set search params",
+						DefaultText: "stdin",
+					},
+					&cli.StringFlag{
+						Name:    "index",
+						Aliases: []string{"i"},
+						Usage:   "index to search",
 					},
 				},
 			},
@@ -161,9 +180,10 @@ var commands = []*cli.Command{
 				Action:    cmdBulkIndex,
 				Flags: []cli.Flag{
 					&cli.PathFlag{
-						Name:    "source",
-						Aliases: []string{"s", "src"},
-						Usage:   "source file path(ndjson) if empty, read stdin",
+						Name:        "source",
+						Aliases:     []string{"s", "src"},
+						Usage:       "source file path(ndjson)",
+						DefaultText: "stdin",
 					},
 					&cli.StringFlag{
 						Name:    "id-column",

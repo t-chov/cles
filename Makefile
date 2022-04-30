@@ -1,5 +1,5 @@
 BIN := cles
-VERSION := "0.0.2"
+VERSION := "0.0.3"
 CURRENT_REVISION := $(shell git rev-parse --short HEAD)
 BUILD_LDFLAGS := "-s -w -X main.revision=$(CURRENT_REVISION)"
 GOBIN ?= $(shell go env GOPATH)/bin

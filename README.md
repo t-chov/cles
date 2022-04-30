@@ -43,7 +43,7 @@ USAGE:
    cles [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.2
+   0.X.Y
 
 COMMANDS:
    indices, i, index    operate indices
@@ -116,6 +116,53 @@ OPTIONS:
    --help, -h                 show help (default: false)
 ```
 
+**bulk** (alias: _b_)
+
+```
+NAME:
+   cles bulk - operate bulk API
+
+USAGE:
+   cles bulk command [command options] [arguments...]
+
+COMMANDS:
+   index, i  exec bulk index from ndjson
+   help, h   Shows a list of commands or help for one command
+
+OPTIONS:
+   --help, -h  show help (default: false)
+```
+
+### Bulk index
+
+`cles bulk index` executes [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
+
+The file format of `--source` is different from the original format.
+You can use ndjson format, but you don't insert a command line.
+
+**wrong**
+
+```json
+{ "index" : { "_index" : "test", "_id" : "1" } } // don't add 
+{ "field1" : "value1" }
+{ "index" : { "_index" : "test", "_id" : "2" } } // don't add
+{ "field1" : "value2" }
+```
+
+**right**
+
+```json
+{ "field1" : "value1" }
+{ "field1" : "value2" }
+```
+
+The example command is below.
+
+```sh
+$ cles bulk index --source /path/to/source.ndjson <INDEX_NAME>
+```
+
+
 ## Environment variables
 
 **ES_ADDRESS**
@@ -134,7 +181,7 @@ If you set this value, the client will use [sniffing](https://www.elastic.co/jp/
 
 ### I have no active conneciton.
 
-If you have this error message, you have to set `ES_SNIFF` false.
+If you have this error message, you have to set `ES_SNIFF` to false.
 
 ```
 initClient failure! cles: no active connection found: no Elasticsearch node available

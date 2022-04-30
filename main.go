@@ -10,7 +10,7 @@ import (
 
 const (
 	appName  = "cles"
-	version  = "0.0.2"
+	version  = "0.0.3"
 	revision = "HEAD"
 )
 

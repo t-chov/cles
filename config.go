@@ -45,7 +45,7 @@ func (cfg *EsConfig) Load(profileName string) error {
 	cfgPath := filepath.Join(dir, "cles", "config.toml")
 
 	f, err := ioutil.ReadFile(cfgPath)
-	if err != nil {
+	if err == nil {
 		profiles := &profiles{}
 		err := toml.Unmarshal(f, profiles)
 		if err != nil {

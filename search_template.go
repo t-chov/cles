@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/olivere/elastic/v7"
@@ -38,11 +37,7 @@ func prettyListTemplate(client *elastic.Client, verbose bool) (*string, error) {
 }
 
 func cmdListSearchTemplates(c *cli.Context) error {
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	output, err := prettyListTemplate(client, c.Bool("verbose"))
 	if err != nil {
@@ -59,11 +54,7 @@ func cmdCreateSearchTemplate(c *cli.Context) error {
 	}
 	templateName := c.Args().Get(0)
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	body := c.Path("body")
 	bytes, err := ioutil.ReadFile(body)
@@ -92,14 +83,10 @@ func cmdDeleteSearchTemplate(c *cli.Context) error {
 	}
 	templateName := c.Args().Get(0)
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	service := client.DeleteScript()
-	_, err = service.Id(templateName).Do(context.Background())
+	_, err := service.Id(templateName).Do(context.Background())
 	if err != nil {
 		return err
 	}
@@ -119,15 +106,11 @@ func cmdRenderSearchTemplate(c *cli.Context) error {
 	}
 	templateName := c.Args().Get(0)
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	var params interface{}
 	paramsRaw := c.String("params")
-	err = json.Unmarshal([]byte(paramsRaw), &params)
+	err := json.Unmarshal([]byte(paramsRaw), &params)
 	if err != nil {
 		return err
 	}

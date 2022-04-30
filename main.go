@@ -10,7 +10,7 @@ import (
 
 const (
 	appName  = "cles"
-	version  = "0.0.1"
+	version  = "0.0.2"
 	revision = "HEAD"
 )
 
@@ -20,14 +20,6 @@ var commands = []*cli.Command{
 		Aliases: []string{"i", "index"},
 		Usage:   "operate indices",
 		Action:  cmdCatIndices,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "profile",
-				Aliases:     []string{"p"},
-				Usage:       "set profile name",
-				DefaultText: "default",
-			},
-		},
 		Subcommands: []*cli.Command{
 			{
 				Name:      "alias",
@@ -36,12 +28,6 @@ var commands = []*cli.Command{
 				Action:    cmdAliasIndex,
 				ArgsUsage: "<INDEX_NAME> <ALIAS_NAME>",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
 					&cli.BoolFlag{
 						Name:    "delete",
 						Aliases: []string{"rm", "d"},
@@ -56,12 +42,6 @@ var commands = []*cli.Command{
 				Action:    cmdCreateIndex,
 				ArgsUsage: "<INDEX_NAME>",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
 					&cli.PathFlag{
 						Name:     "body",
 						Aliases:  []string{"b"},
@@ -76,14 +56,6 @@ var commands = []*cli.Command{
 				Usage:     "delete index",
 				Action:    cmdDeleteIndex,
 				ArgsUsage: "<INDEX_NAME>...",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
-				},
 			},
 			{
 				Name:      "mapping",
@@ -92,12 +64,6 @@ var commands = []*cli.Command{
 				Action:    cmdGetMapping,
 				ArgsUsage: "<INDEX_NAME>...",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
 					&cli.BoolFlag{
 						Name:  "all",
 						Usage: "show all mappings",
@@ -110,24 +76,6 @@ var commands = []*cli.Command{
 		Name:    "cat",
 		Aliases: []string{"c"},
 		Usage:   "exec cat API",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "profile",
-				Aliases:     []string{"p"},
-				Usage:       "set profile name",
-				DefaultText: "default",
-			},
-		},
-		Before: func(c *cli.Context) error {
-			client, err := initClient(c.String("profile"))
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "initClient failure")
-				return err
-			}
-			//lint:ignore SA1029 initClient before subcommand
-			c.Context = context.WithValue(c.Context, "client", client)
-			return nil
-		},
 		Subcommands: []*cli.Command{
 			{
 				Name:    "aliases",
@@ -148,14 +96,6 @@ var commands = []*cli.Command{
 		Aliases: []string{"st"},
 		Usage:   "operate search templates",
 		Action:  cmdListSearchTemplates,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "profile",
-				Aliases:     []string{"p"},
-				Usage:       "set profile name",
-				DefaultText: "default",
-			},
-		},
 		Subcommands: []*cli.Command{
 			{
 				Name:    "list",
@@ -163,12 +103,6 @@ var commands = []*cli.Command{
 				Usage:   "list search template",
 				Action:  cmdListSearchTemplates,
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
 					&cli.BoolFlag{
 						Name:    "verbose",
 						Aliases: []string{"v"},
@@ -183,12 +117,6 @@ var commands = []*cli.Command{
 				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
 				Action:    cmdCreateSearchTemplate,
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
 					&cli.PathFlag{
 						Name:     "body",
 						Aliases:  []string{"b"},
@@ -203,14 +131,6 @@ var commands = []*cli.Command{
 				Usage:     "delete search template",
 				ArgsUsage: "<SEARCH_TEMPLATE_NAME>",
 				Action:    cmdDeleteSearchTemplate,
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
-				},
 			},
 			{
 				Name:      "render",
@@ -219,13 +139,8 @@ var commands = []*cli.Command{
 				Action:    cmdRenderSearchTemplate,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
-						Name:        "profile",
-						Aliases:     []string{"p"},
-						Usage:       "set profile name",
-						DefaultText: "default",
-					},
-					&cli.StringFlag{
 						Name:        "params",
+						Value:       "{}",
 						Usage:       "set params",
 						DefaultText: "{}",
 					},
@@ -233,6 +148,17 @@ var commands = []*cli.Command{
 			},
 		},
 	},
+}
+
+func setAppClient(c *cli.Context) error {
+	client, err := initClient(c.String("profile"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "initClient failure! ")
+		return err
+	}
+	//lint:ignore SA1029 initClient before subcommand
+	c.Context = context.WithValue(c.Context, "client", client)
+	return nil
 }
 
 func msg(err error) int {
@@ -258,6 +184,15 @@ func run() int {
 	app.Version = version
 	app.Commands = commands
 	app.Action = appRun
+	app.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:    "profile",
+			Value:   "default",
+			Aliases: []string{"p"},
+			Usage:   "set profile name",
+		},
+	}
+	app.Before = setAppClient
 
 	return msg(app.Run(os.Args))
 }

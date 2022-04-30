@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/olivere/elastic/v7"
 	"github.com/urfave/cli/v2"
@@ -18,21 +17,17 @@ func cmdAliasIndex(c *cli.Context) error {
 	indexName := c.Args().Get(0)
 	aliasName := c.Args().Get(1)
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	aliasService := elastic.NewAliasService(client)
 
 	if c.Bool("rm") {
-		_, err = aliasService.Remove(indexName, aliasName).Do(context.Background())
+		_, err := aliasService.Remove(indexName, aliasName).Do(context.Background())
 		if err != nil {
 			return err
 		}
 	} else {
-		_, err = aliasService.Add(indexName, aliasName).Do(context.Background())
+		_, err := aliasService.Add(indexName, aliasName).Do(context.Background())
 		if err != nil {
 			return err
 		}
@@ -53,11 +48,7 @@ func cmdCreateIndex(c *cli.Context) error {
 	}
 	indexName := c.Args().Get(0)
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	body := c.Path("body")
 	bytes, err := ioutil.ReadFile(body)
@@ -85,13 +76,9 @@ func cmdDeleteIndex(c *cli.Context) error {
 	}
 	indexNames := c.Args().Slice()
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
-	_, err = client.DeleteIndex(indexNames...).Do(context.Background())
+	_, err := client.DeleteIndex(indexNames...).Do(context.Background())
 	if err != nil {
 		return err
 	}
@@ -111,11 +98,7 @@ func cmdGetMapping(c *cli.Context) error {
 		index = []string{"_all"}
 	}
 
-	client, err := initClient(c.String("profile"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure")
-		return err
-	}
+	client := c.Context.Value("client").(*elastic.Client)
 
 	service := client.GetMapping()
 	res, err := service.Index(index...).Do(context.Background())

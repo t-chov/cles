@@ -19,7 +19,7 @@ address = ["http://localhost:9200"]
 username = ""
 password = ""
 sniff = false
-$ cles cat indices
+$ cles -p default cat indices
 health  status  index   uuid    pri     rep     docs.count      docs.deleted    store.size      pri.store.size
 green   open    .geoip_databases        m0EVcoSZSAuGe7Mj5fB9tg  1       0       40      0       37.7mb  37.7mb
 green   open    foo     IDKzsLa9Q2KCqN7soMoyLw  1       0       0       0       226b    226b
@@ -34,6 +34,29 @@ go install github.com/t-chov/cles@latest
 ```
 
 ## Commands
+
+```
+NAME:
+   cles - Command line client for Elasticsearch
+
+USAGE:
+   cles [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.2
+
+COMMANDS:
+   indices, i, index    operate indices
+   cat, c               exec cat API
+   search-template, st  operate search templates
+   help, h              Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --profile value, -p value  set profile name (default: "default")
+   --help, -h                 show help (default: false)
+   --version, -v              print the version (default: false)
+```
+
 
 **indices** (alias: _i_ , _index_ )
 
@@ -52,7 +75,6 @@ COMMANDS:
    help, h         Shows a list of commands or help for one command
 
 OPTIONS:
-   --profile value, -p value  set profile name (default: default)
    --help, -h                 show help (default: false)
 ```
 
@@ -91,7 +113,6 @@ COMMANDS:
    help, h         Shows a list of commands or help for one command
 
 OPTIONS:
-   --profile value, -p value  set profile name (default: default)
    --help, -h                 show help (default: false)
 ```
 
@@ -108,3 +129,13 @@ This value is used as the password for authentication of Elasticsearch.
 
 **ES_SNIFF**
 If you set this value, the client will use [sniffing](https://www.elastic.co/jp/blog/elasticsearch-sniffing-best-practices-what-when-why-how).
+
+## FAQ
+
+### I have no active conneciton.
+
+If you have this error message, you have to set `ES_SNIFF` false.
+
+```
+initClient failure! cles: no active connection found: no Elasticsearch node available
+```

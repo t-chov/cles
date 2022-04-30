@@ -1,5 +1,8 @@
 # cles: CLI client for Elasticsearch
 
+[![unittest status](https://github.com/t-chov/cles/workflows/unittest/badge.svg)](https://github.com/t-chov/cles/workflows/unittest/badge.svg)
+[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/t-chov/cles/main/LICENSE)
+
 ## What is cles?
 
 **cles** is a tool to manage [Elasticsearch](https://www.elastic.co/elasticsearch/) easily.

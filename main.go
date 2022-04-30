@@ -148,6 +148,33 @@ var commands = []*cli.Command{
 			},
 		},
 	},
+	{
+		Name:    "bulk",
+		Aliases: []string{"b"},
+		Usage:   "operate bulk API",
+		Subcommands: []*cli.Command{
+			{
+				Name:      "index",
+				Aliases:   []string{"i"},
+				Usage:     "exec bulk index from ndjson",
+				ArgsUsage: "<INDEX_NAME>",
+				Action:    cmdBulkIndex,
+				Flags: []cli.Flag{
+					&cli.PathFlag{
+						Name:     "source",
+						Aliases:  []string{"s", "src"},
+						Usage:    "source file path(ndjson)",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:    "id-column",
+						Aliases: []string{"i"},
+						Usage:   "column name for doc id",
+					},
+				},
+			},
+		},
+	},
 }
 
 func setAppClient(c *cli.Context) error {

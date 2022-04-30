@@ -52,7 +52,7 @@ func cmdCreateSearchTemplate(c *cli.Context) error {
 	if c.Args().Len() < 1 {
 		return fmt.Errorf("must set search template name to create")
 	}
-	templateName := c.Args().Get(0)
+	templateName := c.Args().First()
 
 	client := c.Context.Value("client").(*elastic.Client)
 
@@ -81,7 +81,7 @@ func cmdDeleteSearchTemplate(c *cli.Context) error {
 	if c.Args().Len() < 1 {
 		return fmt.Errorf("must set search template name to create")
 	}
-	templateName := c.Args().Get(0)
+	templateName := c.Args().First()
 
 	client := c.Context.Value("client").(*elastic.Client)
 
@@ -104,7 +104,7 @@ func cmdRenderSearchTemplate(c *cli.Context) error {
 	if c.Args().Len() < 1 {
 		return fmt.Errorf("must set search template name to create")
 	}
-	templateName := c.Args().Get(0)
+	templateName := c.Args().First()
 
 	client := c.Context.Value("client").(*elastic.Client)
 

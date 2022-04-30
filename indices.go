@@ -46,7 +46,7 @@ func cmdCreateIndex(c *cli.Context) error {
 	if c.Args().Len() < 1 {
 		return fmt.Errorf("must set index name to create")
 	}
-	indexName := c.Args().Get(0)
+	indexName := c.Args().First()
 
 	client := c.Context.Value("client").(*elastic.Client)
 

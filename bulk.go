@@ -18,10 +18,12 @@ func idToStr(rawId interface{}) (string, error) {
 	switch val := rawId.(type) {
 	case int:
 		return strconv.Itoa(val), nil
+	case int64:
+		return strconv.FormatInt(val, 10), nil
 	case string:
 		return val, nil
 	default:
-		return "", fmt.Errorf("cannot convert id: %v", rawId)
+		return "", fmt.Errorf("cannot convert id: %v(%T)", rawId, rawId)
 	}
 }
 

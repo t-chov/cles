@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
 )
 
 const (
-	appName  = "cles"
-	version  = "0.0.4"
-	revision = "HEAD"
+	appName    = "cles"
+	version    = "0.0.5"
+	revision   = "HEAD"
+	debugColor = color.FgCyan
+	errorColor = color.FgRed
 )
 
 var commands = []*cli.Command{
@@ -196,10 +198,30 @@ var commands = []*cli.Command{
 	},
 }
 
-func setAppClient(c *cli.Context) error {
-	client, err := initClient(c.String("profile"))
+func debug(stream *os.File, message string) {
+	debugFunc := color.New(debugColor).FprintfFunc()
+	debugFunc(stream, message)
+}
+
+func setColoredWriter(c *cli.Context) error {
+	if c.Bool("debug") {
+		//lint:ignore SA1029 set debug stream
+		c.Context = context.WithValue(c.Context, "debugStream", os.Stdout)
+	} else {
+		devNull, err := os.OpenFile(os.DevNull, os.O_APPEND, 0644)
+		if err != nil {
+			return err
+		}
+		//lint:ignore SA1029 set debug stream
+		c.Context = context.WithValue(c.Context, "debugStream", devNull)
+	}
+	return nil
+}
+
+func setClient(c *cli.Context) error {
+	debugStream := c.Context.Value("debugStream").(*os.File)
+	client, err := initClient(c.String("profile"), debugStream)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "initClient failure! ")
 		return err
 	}
 	//lint:ignore SA1029 initClient before subcommand
@@ -207,9 +229,16 @@ func setAppClient(c *cli.Context) error {
 	return nil
 }
 
+func initializeContext(c *cli.Context) error {
+	setColoredWriter(c)
+	err := setClient(c)
+	return err
+}
+
 func msg(err error) int {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+		red := color.New(errorColor).FprintfFunc()
+		red(os.Stderr, "%s: %v\n", os.Args[0], err)
 		return 1
 	}
 	return 0
@@ -237,8 +266,12 @@ func run() int {
 			Aliases: []string{"p"},
 			Usage:   "set profile name",
 		},
+		&cli.BoolFlag{
+			Name:  "debug",
+			Usage: "show detail log",
+		},
 	}
-	app.Before = setAppClient
+	app.Before = initializeContext
 
 	return msg(app.Run(os.Args))
 }

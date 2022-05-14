@@ -54,10 +54,12 @@ COMMANDS:
    indices, i, index    operate indices
    cat, c               exec cat API
    search-template, st  operate search templates
+   bulk, b              operate bulk API
    help, h              Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --profile value, -p value  set profile name (default: "default")
+   --debug                    show detail log (default: false)
    --help, -h                 show help (default: false)
    --version, -v              print the version (default: false)
 ```

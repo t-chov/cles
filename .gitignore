@@ -16,3 +16,4 @@ cles
 # vendor/
 
 *.swp
+.vscode/

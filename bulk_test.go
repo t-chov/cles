@@ -28,6 +28,11 @@ func TestIdToStr(t *testing.T) {
 			expected: "11",
 		},
 		{
+			name:     "int64 convert",
+			arg:      int64(999999),
+			expected: "999999",
+		},
+		{
 			name:     "string convert",
 			arg:      "foobar",
 			expected: "foobar",

@@ -10,7 +10,7 @@ import (
 
 const (
 	appName    = "cles"
-	version    = "0.0.4"
+	version    = "0.0.5"
 	revision   = "HEAD"
 	debugColor = color.FgCyan
 	errorColor = color.FgRed
@@ -196,6 +196,11 @@ var commands = []*cli.Command{
 			},
 		},
 	},
+}
+
+func debug(stream *os.File, message string) {
+	debugFunc := color.New(debugColor).FprintfFunc()
+	debugFunc(stream, message)
 }
 
 func setColoredWriter(c *cli.Context) error {

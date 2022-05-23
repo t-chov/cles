@@ -55,6 +55,7 @@ COMMANDS:
    cat, c               exec cat API
    search-template, st  operate search templates
    bulk, b              operate bulk API
+   reindex, ri          execute reindex API
    help, h              Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -62,6 +63,7 @@ GLOBAL OPTIONS:
    --debug                    show detail log (default: false)
    --help, -h                 show help (default: false)
    --version, -v              print the version (default: false)
+
 ```
 
 
@@ -167,6 +169,23 @@ The example command is below.
 
 ```sh
 $ cles bulk index --source /path/to/source.ndjson <INDEX_NAME>
+```
+
+### Reindex
+
+`cles reindex` executes [Reindex API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html)
+
+First argument is source index, seconds argument is dest index.
+
+```
+NAME:
+   cles reindex - execute reindex API
+
+USAGE:
+   cles reindex [command options] <SOURCE> <DEST>
+
+OPTIONS:
+   --help, -h  show help (default: false)
 ```
 
 

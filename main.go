@@ -196,6 +196,13 @@ var commands = []*cli.Command{
 			},
 		},
 	},
+	{
+		Name:      "reindex",
+		Aliases:   []string{"ri"},
+		Usage:     "execute reindex API",
+		Action:    cmdReindex,
+		ArgsUsage: "<SOURCE> <DEST>",
+	},
 }
 
 func debug(stream *os.File, message string) {

@@ -10,7 +10,7 @@ import (
 
 const (
 	appName    = "cles"
-	version    = "0.0.5"
+	version    = "0.0.6"
 	revision   = "HEAD"
 	debugColor = color.FgCyan
 	errorColor = color.FgRed

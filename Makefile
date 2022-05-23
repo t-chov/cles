@@ -1,5 +1,5 @@
 BIN := cles
-VERSION := "0.0.6"
+VERSION := "0.0.7"
 CURRENT_REVISION := $(shell git rev-parse --short HEAD)
 BUILD_LDFLAGS := "-s -w -X main.revision=$(CURRENT_REVISION)"
 GOBIN ?= $(shell go env GOPATH)/bin
@@ -25,7 +25,7 @@ $(GOBIN)/goxz:
 
 .PHONY: test
 test: build
-	go test -v ./...
+	go test -v ./... -cover
 
 .PHONY: clean
 clean:

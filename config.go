@@ -25,7 +25,7 @@ type EsConfig struct {
 	Password string
 }
 
-func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
+func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) error {
 	// default value
 	cfg.Address = []string{"http://127.0.0.1:9200"}
 	cfg.Username = ""
@@ -45,7 +45,7 @@ func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
 		dir = filepath.Join(os.Getenv("HOME"), ".config")
 	}
 	cfgPath := filepath.Join(dir, "cles", "config.toml")
-	debug(debugStream, fmt.Sprintf("load config from %s\n", cfgPath))
+	debugFn(fmt.Sprintf("load config from %s", cfgPath))
 
 	f, err := ioutil.ReadFile(cfgPath)
 	if err == nil {
@@ -62,7 +62,7 @@ func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
 				cfg.Password = profile.Password
 				cfg.Sniff = profile.Sniff
 				debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-				debug(debugStream, fmt.Sprintf("config: %s\n", debugOut))
+				debugFn(fmt.Sprintf("config: %s", debugOut))
 				return nil
 			}
 		}
@@ -82,21 +82,21 @@ func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
 		cfg.Sniff = strings.ToLower(os.Getenv("ES_SNIFF")) == "true"
 	}
 	debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-	debug(debugStream, fmt.Sprintf("config: %s\n", debugOut))
+	debugFn(fmt.Sprintf("config: %s", debugOut))
 
 	return nil
 }
 
-func initClient(profile string, debugStream *os.File) (*elastic.Client, error) {
+func initClient(profile string, debugFn func(message string)) (*elastic.Client, error) {
 	var cfg EsConfig
-	err := cfg.Load(profile, debugStream)
+	err := cfg.Load(profile, debugFn)
 	if err != nil {
 		return nil, err
 	}
-	debug(debugStream, fmt.Sprintf("URL  : %v\n", cfg.Address))
-	debug(debugStream, fmt.Sprintf("USER : %s\n", cfg.Username))
-	debug(debugStream, fmt.Sprintf("PASS : %s\n", cfg.Password))
-	debug(debugStream, fmt.Sprintf("SNIFF: %v\n", cfg.Sniff))
+	debugFn(fmt.Sprintf("URL  : %v", cfg.Address))
+	debugFn(fmt.Sprintf("USER : %s", cfg.Username))
+	debugFn(fmt.Sprintf("PASS : %s", cfg.Password))
+	debugFn(fmt.Sprintf("SNIFF: %v", cfg.Sniff))
 	client, err := elastic.NewClient(
 		elastic.SetURL(cfg.Address...),
 		elastic.SetBasicAuth(cfg.Username, cfg.Password),

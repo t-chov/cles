@@ -25,6 +25,33 @@ type EsConfig struct {
 	Password string
 }
 
+func loadConfigFile(path string, profile string, debugFn func(msg string)) (*EsConfig, error) {
+	debugFn(fmt.Sprintf("config file path: %s", path))
+	f, err := ioutil.ReadFile(path)
+	if err == nil {
+		profiles := &profiles{}
+		err := toml.Unmarshal(f, profiles)
+		if err != nil {
+			return nil, err
+		}
+		for _, prof := range profiles.Profile {
+			if prof.Name == profile {
+				cfg := EsConfig{
+					Name:     prof.Name,
+					Address:  prof.Address,
+					Username: prof.Username,
+					Password: prof.Password,
+					Sniff:    prof.Sniff,
+				}
+				debugOut, _ := json.MarshalIndent(cfg, "", "  ")
+				debugFn(fmt.Sprintf("config: %s", debugOut))
+				return &cfg, nil
+			}
+		}
+	}
+	return nil, nil
+}
+
 func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) error {
 	// default value
 	cfg.Address = []string{"http://127.0.0.1:9200"}

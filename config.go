@@ -25,31 +25,30 @@ type EsConfig struct {
 	Password string
 }
 
-func loadConfigFile(path string, profile string, debugFn func(msg string)) (*EsConfig, error) {
+func (c *EsConfig) LoadFromFile(path string, profile string, debugFn func(msg string)) error {
 	debugFn(fmt.Sprintf("config file path: %s", path))
 	f, err := ioutil.ReadFile(path)
 	if err == nil {
 		profiles := &profiles{}
 		err := toml.Unmarshal(f, profiles)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		for _, prof := range profiles.Profile {
 			if prof.Name == profile {
-				cfg := EsConfig{
-					Name:     prof.Name,
-					Address:  prof.Address,
-					Username: prof.Username,
-					Password: prof.Password,
-					Sniff:    prof.Sniff,
-				}
-				debugOut, _ := json.MarshalIndent(cfg, "", "  ")
+				c.Name = prof.Name
+				c.Address = prof.Address
+				c.Username = prof.Username
+				c.Password = prof.Password
+				c.Sniff = prof.Sniff
+				debugOut, _ := json.MarshalIndent(c, "", "  ")
 				debugFn(fmt.Sprintf("config: %s", debugOut))
-				return &cfg, nil
+				return nil
 			}
 		}
 	}
-	return nil, nil
+	return nil
+
 }
 
 func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) error {
@@ -81,18 +80,7 @@ func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) erro
 		if err != nil {
 			return err
 		}
-		for _, profile := range profiles.Profile {
-			if profile.Name == profileName {
-				cfg.Name = profile.Name
-				cfg.Address = profile.Address
-				cfg.Username = profile.Username
-				cfg.Password = profile.Password
-				cfg.Sniff = profile.Sniff
-				debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-				debugFn(fmt.Sprintf("config: %s", debugOut))
-				return nil
-			}
-		}
+		cfg.LoadFromFile(cfgPath, profileName, debugFn)
 	}
 
 	// overwrite with environment variables

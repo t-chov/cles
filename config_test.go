@@ -10,12 +10,13 @@ func TestLoadConfigFile(t *testing.T) {
 	t.Run(
 		"file note exist",
 		func(t *testing.T) {
-			got, err := loadConfigFile(".", "notfound", testDebugFunc)
+			var cfg *EsConfig
+			err := cfg.LoadFromFile(".", "notfound", testDebugFunc)
 			if err != nil {
 				t.Errorf("expected no error, got %v", err)
 			}
-			if got != nil {
-				t.Errorf("expected nil, got %v", got)
+			if cfg != nil {
+				t.Errorf("expected nil, got %v", *cfg)
 			}
 		},
 	)

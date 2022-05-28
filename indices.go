@@ -34,7 +34,7 @@ func cmdAliasIndex(c *cli.Context) error {
 		}
 	}
 
-	res, err := prettyCatAliases(client)
+	res, err := prettyCatAliases(client.CatAliases().Human(true))
 	if err != nil {
 		return err
 	}

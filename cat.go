@@ -9,15 +9,19 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func prettyCatAliases(client *elastic.Client) (*string, error) {
-	res, err := client.CatAliases().Human(true).Do(context.Background())
+type catAliasesSvc interface {
+	Do(ctx context.Context) (elastic.CatAliasesResponse, error)
+}
+
+func prettyCatAliases(service catAliasesSvc) (*string, error) {
+	res, err := service.Do(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
 	var buf strings.Builder
 
-	buf.WriteString(fmt.Sprintln("alias\tindex\trouting.index\trouting.search\tis_write_index\t"))
+	buf.WriteString(fmt.Sprintln("alias\tindex\trouting.index\trouting.search\tis_write_index"))
 	for _, v := range res {
 		row := fmt.Sprintf(
 			"%s\t%s\t%s\t%s\t%s\n",
@@ -60,7 +64,7 @@ func prettyCatIndices(client *elastic.Client) (*string, error) {
 func cmdCatAliases(c *cli.Context) error {
 	client := c.Context.Value("client").(*elastic.Client)
 
-	res, err := prettyCatAliases(client)
+	res, err := prettyCatAliases(client.CatAliases().Human(true))
 	if err != nil {
 		return err
 	}

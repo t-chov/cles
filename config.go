@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,44 +24,12 @@ type EsConfig struct {
 	Password string
 }
 
-func (c *EsConfig) LoadFromFile(path string, profile string, debugFn func(msg string)) error {
-	debugFn(fmt.Sprintf("config file path: %s", path))
-	f, err := ioutil.ReadFile(path)
-	if err == nil {
-		profiles := &profiles{}
-		err := toml.Unmarshal(f, profiles)
-		if err != nil {
-			return err
-		}
-		for _, prof := range profiles.Profile {
-			if prof.Name == profile {
-				c.Name = prof.Name
-				c.Address = prof.Address
-				c.Username = prof.Username
-				c.Password = prof.Password
-				c.Sniff = prof.Sniff
-				debugOut, _ := json.MarshalIndent(c, "", "  ")
-				debugFn(fmt.Sprintf("config: %s", debugOut))
-				return nil
-			}
-		}
-	}
-	return nil
-
-}
-
-func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) error {
-	// default value
-	cfg.Address = []string{"http://127.0.0.1:9200"}
-	cfg.Username = ""
-	cfg.Password = ""
-	cfg.Sniff = false
-
-	// load from config file.
+func setConfigFilePath(runtimeOS string) string {
+	// set config file by OS.
 	// windows: $APPDATA\cles\
 	// unix-like: $HOME/.config/cles/
 	var dir string
-	if runtime.GOOS == "windows" {
+	if runtimeOS == "windows" {
 		dir = os.Getenv("APPDATA")
 		if dir == "" {
 			dir = filepath.Join(os.Getenv("USERPROFILE"), "Application Data")
@@ -70,17 +37,49 @@ func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) erro
 	} else {
 		dir = filepath.Join(os.Getenv("HOME"), ".config")
 	}
-	cfgPath := filepath.Join(dir, "cles", "config.toml")
-	debugFn(fmt.Sprintf("load config from %s", cfgPath))
+	return filepath.Join(dir, "cles", "config.toml")
+}
 
-	f, err := ioutil.ReadFile(cfgPath)
+func loadConfigFromFile(path string, profile string) (*EsConfig, error) {
+	f, err := ioutil.ReadFile(path)
 	if err == nil {
 		profiles := &profiles{}
 		err := toml.Unmarshal(f, profiles)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		cfg.LoadFromFile(cfgPath, profileName, debugFn)
+		for _, prof := range profiles.Profile {
+			if prof.Name == profile {
+				cfg := EsConfig{
+					Name:     prof.Name,
+					Address:  prof.Address,
+					Username: prof.Username,
+					Password: prof.Password,
+					Sniff:    prof.Sniff,
+				}
+				return &cfg, nil
+			}
+		}
+	}
+	return nil, nil
+}
+
+func loadConfig(cfgPath string, profileName string) (*EsConfig, error) {
+	// default value
+	cfg := EsConfig{
+		Name:     profileName,
+		Address:  []string{"http://127.0.0.1:9200"},
+		Username: "",
+		Password: "",
+		Sniff:    false,
+	}
+
+	fcfg, err := loadConfigFromFile(cfgPath, profileName)
+	if err != nil {
+		return nil, err
+	}
+	if fcfg != nil {
+		cfg = *fcfg
 	}
 
 	// overwrite with environment variables
@@ -96,15 +95,14 @@ func (cfg *EsConfig) Load(profileName string, debugFn func(message string)) erro
 	if len(os.Getenv("ES_SNIFF")) > 0 {
 		cfg.Sniff = strings.ToLower(os.Getenv("ES_SNIFF")) == "true"
 	}
-	debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-	debugFn(fmt.Sprintf("config: %s", debugOut))
 
-	return nil
+	return &cfg, nil
 }
 
 func initClient(profile string, debugFn func(message string)) (*elastic.Client, error) {
-	var cfg EsConfig
-	err := cfg.Load(profile, debugFn)
+	cfgPath := setConfigFilePath(runtime.GOOS)
+	debugFn(fmt.Sprintf("config file path: %s", cfgPath))
+	cfg, err := loadConfig(cfgPath, profile)
 	if err != nil {
 		return nil, err
 	}

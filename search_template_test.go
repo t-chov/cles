@@ -87,3 +87,16 @@ func TestBuildTemplateParametersWithRawParams(t *testing.T) {
 		t.Errorf("expected %v, got %v", expected, actual)
 	}
 }
+
+func TestSortStoredScripts(t *testing.T) {
+	scripts := map[string]interface{}{
+		"foo": 1,
+		"bar": 2,
+		"baz": 3,
+	}
+	want := []string{"bar", "baz", "foo"}
+	got := sortStoredScripts(scripts)
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}

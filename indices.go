@@ -34,7 +34,7 @@ func cmdAliasIndex(c *cli.Context) error {
 		}
 	}
 
-	res, err := prettyCatAliases(client)
+	res, err := prettyCatAliases(client.CatAliases().Human(true))
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func cmdCreateIndex(c *cli.Context) error {
 		return err
 	}
 
-	res, err := prettyCatIndices(client)
+	res, err := prettyCatIndices(client.CatIndices().Human(true))
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func cmdDeleteIndex(c *cli.Context) error {
 		return err
 	}
 
-	res, err := prettyCatIndices(client)
+	res, err := prettyCatIndices(client.CatIndices().Human(true))
 	if err != nil {
 		return err
 	}

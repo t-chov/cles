@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,18 +24,12 @@ type EsConfig struct {
 	Password string
 }
 
-func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
-	// default value
-	cfg.Address = []string{"http://127.0.0.1:9200"}
-	cfg.Username = ""
-	cfg.Password = ""
-	cfg.Sniff = false
-
-	// load from config file.
+func setConfigFilePath(runtimeOS string) string {
+	// set config file by OS.
 	// windows: $APPDATA\cles\
 	// unix-like: $HOME/.config/cles/
 	var dir string
-	if runtime.GOOS == "windows" {
+	if runtimeOS == "windows" {
 		dir = os.Getenv("APPDATA")
 		if dir == "" {
 			dir = filepath.Join(os.Getenv("USERPROFILE"), "Application Data")
@@ -44,28 +37,49 @@ func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
 	} else {
 		dir = filepath.Join(os.Getenv("HOME"), ".config")
 	}
-	cfgPath := filepath.Join(dir, "cles", "config.toml")
-	debug(debugStream, fmt.Sprintf("load config from %s\n", cfgPath))
+	return filepath.Join(dir, "cles", "config.toml")
+}
 
-	f, err := ioutil.ReadFile(cfgPath)
+func loadConfigFromFile(path string, profile string) (*EsConfig, error) {
+	f, err := ioutil.ReadFile(path)
 	if err == nil {
 		profiles := &profiles{}
 		err := toml.Unmarshal(f, profiles)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		for _, profile := range profiles.Profile {
-			if profile.Name == profileName {
-				cfg.Name = profile.Name
-				cfg.Address = profile.Address
-				cfg.Username = profile.Username
-				cfg.Password = profile.Password
-				cfg.Sniff = profile.Sniff
-				debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-				debug(debugStream, fmt.Sprintf("config: %s\n", debugOut))
-				return nil
+		for _, prof := range profiles.Profile {
+			if prof.Name == profile {
+				cfg := EsConfig{
+					Name:     prof.Name,
+					Address:  prof.Address,
+					Username: prof.Username,
+					Password: prof.Password,
+					Sniff:    prof.Sniff,
+				}
+				return &cfg, nil
 			}
 		}
+	}
+	return nil, nil
+}
+
+func loadConfig(cfgPath string, profileName string) (*EsConfig, error) {
+	// default value
+	cfg := EsConfig{
+		Name:     profileName,
+		Address:  []string{"http://127.0.0.1:9200"},
+		Username: "",
+		Password: "",
+		Sniff:    false,
+	}
+
+	fcfg, err := loadConfigFromFile(cfgPath, profileName)
+	if err != nil {
+		return nil, err
+	}
+	if fcfg != nil {
+		cfg = *fcfg
 	}
 
 	// overwrite with environment variables
@@ -81,22 +95,21 @@ func (cfg *EsConfig) Load(profileName string, debugStream *os.File) error {
 	if len(os.Getenv("ES_SNIFF")) > 0 {
 		cfg.Sniff = strings.ToLower(os.Getenv("ES_SNIFF")) == "true"
 	}
-	debugOut, _ := json.MarshalIndent(cfg, "", "  ")
-	debug(debugStream, fmt.Sprintf("config: %s\n", debugOut))
 
-	return nil
+	return &cfg, nil
 }
 
-func initClient(profile string, debugStream *os.File) (*elastic.Client, error) {
-	var cfg EsConfig
-	err := cfg.Load(profile, debugStream)
+func initClient(profile string, debugFn func(message string)) (*elastic.Client, error) {
+	cfgPath := setConfigFilePath(runtime.GOOS)
+	debugFn(fmt.Sprintf("config file path: %s", cfgPath))
+	cfg, err := loadConfig(cfgPath, profile)
 	if err != nil {
 		return nil, err
 	}
-	debug(debugStream, fmt.Sprintf("URL  : %v\n", cfg.Address))
-	debug(debugStream, fmt.Sprintf("USER : %s\n", cfg.Username))
-	debug(debugStream, fmt.Sprintf("PASS : %s\n", cfg.Password))
-	debug(debugStream, fmt.Sprintf("SNIFF: %v\n", cfg.Sniff))
+	debugFn(fmt.Sprintf("URL  : %v", cfg.Address))
+	debugFn(fmt.Sprintf("USER : %s", cfg.Username))
+	debugFn(fmt.Sprintf("PASS : %s", cfg.Password))
+	debugFn(fmt.Sprintf("SNIFF: %v", cfg.Sniff))
 	client, err := elastic.NewClient(
 		elastic.SetURL(cfg.Address...),
 		elastic.SetBasicAuth(cfg.Username, cfg.Password),

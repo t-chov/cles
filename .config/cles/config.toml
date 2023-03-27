@@ -1,0 +1,6 @@
+[[profile]]
+name = "default"
+address = ["http://localhost:9200"]
+username = "elastic"
+password = "elasticPassword"
+sniff = false

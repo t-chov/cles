@@ -8,7 +8,7 @@ import (
 
 const (
 	APP_NAME = "cles"
-	VERSION  = "0.0.7"
+	VERSION  = "0.0.8"
 	REVISION = "HEAD"
 )
 

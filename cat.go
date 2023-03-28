@@ -68,7 +68,7 @@ func prettyCatIndices(service catIndicesSvc) (*string, error) {
 func cmdCatAliases(c *cli.Context) error {
 	client := c.Context.Value("client").(*elastic.Client)
 
-	res, err := prettyCatAliases(client.CatAliases().Human(true))
+	res, err := prettyCatAliases(client.CatAliases().Sort("alias").Human(true))
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func cmdCatAliases(c *cli.Context) error {
 func cmdCatIndices(c *cli.Context) error {
 	client := c.Context.Value("client").(*elastic.Client)
 
-	res, err := prettyCatIndices(client.CatIndices().Human(true))
+	res, err := prettyCatIndices(client.CatIndices().Sort("index").Human(true))
 	if err != nil {
 		return err
 	}

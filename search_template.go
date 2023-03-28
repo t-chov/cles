@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/olivere/elastic/v7"
@@ -32,6 +33,17 @@ func buildTemplateParameters(templateId string, rawParams string, stream *os.Fil
 	return searchBody, nil
 }
 
+func sortStoredScripts(scripts map[string]interface{}) []string {
+	keys := make([]string, len(scripts))
+	i := 0
+	for k := range scripts {
+		keys[i] = k
+		i++
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 func prettyListTemplate(client *elastic.Client, verbose bool) (*string, error) {
 	state, err := client.ClusterState().Do(context.Background())
 	if err != nil {
@@ -48,7 +60,7 @@ func prettyListTemplate(client *elastic.Client, verbose bool) (*string, error) {
 		outputString = string(output)
 	} else {
 		var buf strings.Builder
-		for key := range templates {
+		for _, key := range sortStoredScripts(templates) {
 			buf.WriteString(fmt.Sprintln(key))
 		}
 		outputString = buf.String()

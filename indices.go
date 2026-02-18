@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/olivere/elastic/v7"
@@ -55,9 +55,9 @@ func cmdCreateIndex(c *cli.Context) error {
 	var bytes []byte
 	var err error
 	if len(body) > 0 {
-		bytes, err = ioutil.ReadFile(body)
+		bytes, err = os.ReadFile(body)
 	} else {
-		bytes, err = ioutil.ReadAll(os.Stdin)
+		bytes, err = io.ReadAll(os.Stdin)
 	}
 	if err != nil {
 		return err

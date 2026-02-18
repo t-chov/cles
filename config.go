@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -41,7 +40,7 @@ func setConfigFilePath(runtimeOS string) string {
 }
 
 func loadConfigFromFile(path string, profile string) (*EsConfig, error) {
-	f, err := ioutil.ReadFile(path)
+	f, err := os.ReadFile(path)
 	if err == nil {
 		profiles := &profiles{}
 		err := toml.Unmarshal(f, profiles)

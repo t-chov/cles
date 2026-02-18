@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -52,7 +51,7 @@ func TestIdToStr(t *testing.T) {
 }
 
 func TestCalsNumOfLines(t *testing.T) {
-	tempFile, err := ioutil.TempFile(os.TempDir(), "cles-test-temp-")
+	tempFile, err := os.CreateTemp(os.TempDir(), "cles-test-temp-")
 	if err != nil {
 		t.Error(err)
 	}

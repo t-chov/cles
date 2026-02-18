@@ -2,14 +2,13 @@ package main
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
 )
 
 func TestBuildTemplateParametersWithStreamError(t *testing.T) {
-	tempFile, err := ioutil.TempFile(os.TempDir(), "cles-template-temp-")
+	tempFile, err := os.CreateTemp(os.TempDir(), "cles-template-temp-")
 	if err != nil {
 		t.Error(err)
 	}
@@ -28,7 +27,7 @@ func TestBuildTemplateParametersWithStreamError(t *testing.T) {
 }
 
 func TestBuildTemplateParametersWithEOFError(t *testing.T) {
-	tempFile, err := ioutil.TempFile(os.TempDir(), "cles-template-temp-")
+	tempFile, err := os.CreateTemp(os.TempDir(), "cles-template-temp-")
 	if err != nil {
 		t.Error(err)
 	}
@@ -41,7 +40,7 @@ func TestBuildTemplateParametersWithEOFError(t *testing.T) {
 }
 
 func TestBuildTemplateParametersWithStream(t *testing.T) {
-	tempFile, err := ioutil.TempFile(os.TempDir(), "cles-template-temp-")
+	tempFile, err := os.CreateTemp(os.TempDir(), "cles-template-temp-")
 	if err != nil {
 		t.Error(err)
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"os"
 	"sort"
@@ -17,7 +17,7 @@ import (
 func buildTemplateParameters(templateId string, rawParams string, stream *os.File) (map[string]interface{}, error) {
 	var params interface{}
 	if len(rawParams) == 0 {
-		bytes, err := ioutil.ReadAll(stream)
+		bytes, err := io.ReadAll(stream)
 		if err != nil {
 			return nil, err
 		}
@@ -92,9 +92,9 @@ func cmdCreateSearchTemplate(c *cli.Context) error {
 	var bytes []byte
 	var err error
 	if len(body) > 0 {
-		bytes, err = ioutil.ReadFile(body)
+		bytes, err = os.ReadFile(body)
 	} else {
-		bytes, err = ioutil.ReadAll(os.Stdin)
+		bytes, err = io.ReadAll(os.Stdin)
 	}
 	if err != nil {
 		return err
